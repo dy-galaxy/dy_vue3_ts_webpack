@@ -1,5 +1,7 @@
 import { createApp } from "vue";
 import App from "./App.vue";
 import router from "@/router";
+import { store, key } from "@/store";
+import "@/assets/common.less";
 
-createApp(App).use(router).mount("#app");
+createApp(App).use(router).use(store, key).mount("#app");

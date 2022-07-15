@@ -1,10 +1,11 @@
-const { DefinePlugin } = require("webpack");
+const webpack = require("webpack");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 const { VueLoaderPlugin } = require("vue-loader");
 const AutoImport = require("unplugin-auto-import/webpack");
 const Components = require("unplugin-vue-components/webpack");
 const { ElementPlusResolver } = require("unplugin-vue-components/resolvers");
+const tsImportPluginFactory = require("ts-import-plugin"); //不加会报警告，并且不渲染页面 [Vue warn]: Failed to mount component: template or render function not defined. 错误解决方法
 
 module.exports = {
     mode: process.env.NODE_ENV == "production" ? "production" : "development", //默认是开发模块
@@ -21,6 +22,7 @@ module.exports = {
         static: path.join(__dirname, "dist"),
         historyApiFallback: true,
         port: 80,
+        // static: "0.0.0.0:9528",
     },
     resolve: {
         alias: {
@@ -41,16 +43,22 @@ module.exports = {
                 ],
             },
             {
-                test: /\.ts(x)*$/,
+                test: /\.ts(x)?$/,
                 use: [
                     {
-                        loader: "babel-loader",
+                        loader: "ts-loader",
                         options: {
-                            presets: ["@babel/preset-env"],
+                            transpileOnly: true,
+                            getCustomTransformers: () => ({
+                                before: [tsImportPluginFactory({})],
+                            }),
+                            compilerOptions: {
+                                module: "es2015",
+                            },
                         },
                     },
-                    "ts-loader",
                 ],
+                exclude: /node_module/,
             },
             {
                 test: /\.js(x)*$/,
@@ -69,8 +77,8 @@ module.exports = {
                     {
                         loader: "postcss-loader",
                         options: {
-                            postOptions: {
-                                plugins: ["autoprefixer"],
+                            postcssOptions: {
+                                plugins: ["postcss-preset-env"],
                             },
                         },
                     },
@@ -93,7 +101,7 @@ module.exports = {
         Components({
             resolvers: [ElementPlusResolver()],
         }),
-        new DefinePlugin({
+        new webpack.DefinePlugin({
             //vue 3.x 增加了两个编译时配置：__VUE_OPTIONS_API__和__VUE_PROD_DEVTOOLS__，适当地配置它们能提高 tree shaking 的效果。
             //因为程序不允许使用未定义的变量，所以目前使用 vue 3.x 会报错。
             __VUE_OPTIONS_API__: JSON.stringify(true),
