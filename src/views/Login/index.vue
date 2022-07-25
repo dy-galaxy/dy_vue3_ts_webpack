@@ -26,11 +26,19 @@
 
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
+// import { useStore } from "vuex";
 import type { FormInstance } from "element-plus";
+
+import router from "@/router";
+import store from "@/store";
+import { userLogin } from "@/api/https";
+import { LoginParams } from "@/typings";
+
+// const store = useStore();
 
 const formRef = ref<FormInstance>();
 
-const ruleForm = reactive({
+const ruleForm: LoginParams = reactive({
     username: "",
     password: "",
 });
@@ -56,10 +64,17 @@ const rules = reactive({
 
 const onSubmit = async (formEl: FormInstance | undefined) => {
     if (!formEl) return;
-    await formEl.validate((valid) => {
+    await formEl.validate(async (valid) => {
         if (valid) {
-            console.log(ruleForm.username);
-            console.log(ruleForm.password);
+            let { data: res } = await userLogin(ruleForm);
+            // store.commit("SET_TOKEN", res.token);
+            store.dispatch("SET_TOKEN", res.token);
+            console.log(res.code);
+            if (res.code === 0) {
+                router.push({
+                    path: "/",
+                });
+            }
         } else {
             console.log("error submit");
             return false;

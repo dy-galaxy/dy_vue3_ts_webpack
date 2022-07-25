@@ -27,12 +27,14 @@
 <script lang="ts" setup>
 import { reactive, ref } from "vue";
 import type { FormInstance } from "element-plus";
-import { useRouter } from "vue-router";
+
+import router from "@/router";
+import store from "@/store";
 
 import { userRegister } from "@/api/https";
 import { RegisterParams } from "@/typings";
 
-const router = useRouter();
+// const router = useRouter();
 
 const formRef = ref<FormInstance>();
 
@@ -66,7 +68,7 @@ const onSubmit = async (formEl: FormInstance | undefined) => {
         if (valid) {
             let { data: res } = await userRegister(ruleForm);
 
-            window.sessionStorage.setItem("token", res.token);
+            store.dispatch("SET_TOKEN", res.token);
 
             console.log(res);
             if (res.code === 0) {

@@ -12,10 +12,11 @@
     </div>
 </template>
 <script lang="ts">
-import { useStore } from "@/store";
+// import { useStore } from "vuex";
+import store from "@/store";
+
 export default {
     setup() {
-        const store = useStore();
         let token = store.state.token;
         console.log(token);
     },

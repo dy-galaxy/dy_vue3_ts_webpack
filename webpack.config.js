@@ -106,6 +106,10 @@ module.exports = {
             //因为程序不允许使用未定义的变量，所以目前使用 vue 3.x 会报错。
             __VUE_OPTIONS_API__: JSON.stringify(true),
             __VUE_PROD_DEVTOOLS__: JSON.stringify(false),
+            BASE_URL: '"/"',
+            // "process.env": {
+            //     BASE_URL: '"/"',
+            // },
         }),
     ],
 };
